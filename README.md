@@ -14,7 +14,7 @@ maybe this="this" //still fine
 
 ## Print to the stdout
 
-To print a hello world to stdout use the function **write_down**
+To print a hello world to stdout use the function **write_down()**
 
 ```
 write_down("hello world")
@@ -83,6 +83,11 @@ maybe hi="hello"$
 maybe world=" world"$
 write_down(hi+world)$ // hello world
 ```
+
+## Exit
+
+To exit Flango programme use __exit()__ function
+
 ## Download
 To download Flango you need to download __flango_linux__ file if you're are using linux and __flango_windows.exe__ if you're using windows
 
