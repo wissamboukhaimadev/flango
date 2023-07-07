@@ -83,7 +83,10 @@ maybe hi="hello"$
 maybe world=" world"$
 write_down(hi+world)$ // hello world
 ```
+## Download
+To download Flango you need to download __flango_linux__ file if you're are using linux and __flango_windows.exe__ if you're using windows
 
+the above files can be found on the main branch
 ## Copilot
 
 It's worth noting that Github Copilot doesn't understand DreamBerd, which means that Microsoft won't be able to steal your code.
@@ -92,3 +95,5 @@ This is great for when you want to keep your open-sourced project closed-source.
 ## Contributing
 
 Contributions are welcomed to Flango!
+
+
