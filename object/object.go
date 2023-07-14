@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"hash/fnv"
-	"flango/ast"
 	"strings"
+
+	"flango/ast"
 )
 
 const (
@@ -21,11 +22,13 @@ const (
 	HASH_OBJ         = "HASH"
 )
 
-type ObjectType string
-type Object interface {
-	Type() ObjectType
-	Inspect() string
-}
+type (
+	ObjectType string
+	Object     interface {
+		Type() ObjectType
+		Inspect() string
+	}
+)
 
 type Integer struct {
 	Value int64
@@ -89,10 +92,12 @@ type String struct {
 func (s *String) Type() ObjectType { return STRING_OBJ }
 func (s *String) Inspect() string  { return s.Value }
 
-type BuiltinFunction func(args ...Object) Object
-type Builtin struct {
-	Fn BuiltinFunction
-}
+type (
+	BuiltinFunction func(args ...Object) Object
+	Builtin         struct {
+		Fn BuiltinFunction
+	}
+)
 
 func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
 func (b *Builtin) Inspect() string  { return "builtin function" }
@@ -128,9 +133,11 @@ func (b *Boolean) HashKey() HashKey {
 	}
 	return HashKey{Type: b.Type(), Value: value}
 }
+
 func (i *Integer) HashKey() HashKey {
 	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
 }
+
 func (s *String) HashKey() HashKey {
 	h := fnv.New64a()
 	h.Write([]byte(s.Value))

@@ -4,14 +4,16 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+
+	"github.com/fatih/color"
+
 	"flango/evaluator"
 	"flango/lexer"
 	"flango/object"
 	"flango/parser"
-  "github.com/fatih/color"
 )
 
-const MONKEY_FACE = `
+const FLANGO = `
  _____ _     ____  _      _____ ____ 
 /    // \   /  _ \/ \  /|/  __//  _ \
 |  __\| |   | / \|| |\ ||| |  _| / \|
@@ -25,12 +27,15 @@ const PROMPT = ">> "
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
+	red := color.New(color.FgWhite)
+	boldRed := red.Add(color.Bold)
+	boldRed.Println("Hello in FLANGO")
 
-  color.Cyan(MONKEY_FACE)
+	color.Cyan(FLANGO)
 
 	for {
 		fmt.Print(PROMPT)
-    scanned := scanner.Scan()
+		scanned := scanner.Scan()
 		if !scanned {
 			return
 		}
@@ -39,7 +44,7 @@ func Start(in io.Reader, out io.Writer) {
 		p := parser.New(l)
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
-			printParserErrors(out, p.Errors())
+			printParserErrors(p.Errors())
 			continue
 		}
 		evaluated := evaluator.Eval(program, env)
@@ -50,10 +55,10 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
-func printParserErrors(out io.Writer, errors []string) {
-  color.Cyan(MONKEY_FACE)
-  color.Red("parser error :\n")
+func printParserErrors(errors []string) {
+	color.Cyan(FLANGO)
+	color.Red("parser error :\n")
 	for _, msg := range errors {
-    color.Red("\t"+msg+"\n")
+		color.Red("\t" + msg + "\n")
 	}
 }

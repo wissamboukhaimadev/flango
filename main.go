@@ -1,16 +1,18 @@
 package main
 
 import (
-	 "github.com/fatih/color"
-	"flango/repl"
 	"os"
+
+	"flango/fileparser"
+	"flango/repl"
 )
 
 func main() {
-  red := color.New(color.FgWhite)
-
-  boldRed := red.Add(color.Bold)
-  boldRed.Println("Hello in FLANGO")
-
-	repl.Start(os.Stdin, os.Stdout)
+	args := os.Args
+	if len(args) == 1 {
+		repl.Start(os.Stdin, os.Stdout)
+	} else {
+		filePath := args[1]
+		fileparser.ParseFile(filePath)
+	}
 }

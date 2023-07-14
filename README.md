@@ -59,6 +59,28 @@ maybe bool=true
 maybe bool2=false
 ```
 
+## Inc Dec instructions
+
+```
+maybe x=10$
+++x$  //11
+--x //9
+x+=2  //12
+x-=2 //8
+x*=2 //20
+x/=2 //5
+```
+
+## Loops
+
+flango supports for loop like every other programming language
+
+```
+for(x=0$x<5$++x){
+    write_down("the value of x is ",x)
+}
+```
+
 ## Functions
 
 Let's write a functions that calculates the max between two parameters
@@ -86,12 +108,14 @@ write_down(hi+world)$ // hello world
 
 ## Exit
 
-To exit Flango programme use __exit()__ function
+To exit Flango programme use **exit()** function
 
 ## Download
-To download Flango you need to download __flango_linux__ file if you're are using linux and __flango_windows.exe__ if you're using windows
+
+To download Flango you need to download **flango_linux** file if you're are using linux and **flango_windows.exe** if you're using windows
 
 the above files can be found on the main branch
+
 ## Copilot
 
 It's worth noting that Github Copilot doesn't understand DreamBerd, which means that Microsoft won't be able to steal your code.
@@ -101,4 +125,16 @@ This is great for when you want to keep your open-sourced project closed-source.
 
 Contributions are welcomed to Flango!
 
+## Highlighting
 
+Flango has a VSCode extension for synstax highlighting. To enable it, install [flango extension](https://marketplace.visualstudio.com/items?itemName=wissam4373642.flango)
+This is what it looks like:
+
+```
+maybe name="boukhaima"
+write_down(name)
+```
+
+**Please note**: The above code will only highlight correctly if you have the extension installed.
+
+Flango was made by wissam boukhaima 😙

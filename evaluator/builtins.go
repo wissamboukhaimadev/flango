@@ -2,12 +2,13 @@ package evaluator
 
 import (
 	"fmt"
-	"flango/object"
 	"os"
+
+	"flango/object"
 )
 
 var builtins = map[string]*object.Builtin{
-	"length": &object.Builtin{
+	"length": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
@@ -24,14 +25,14 @@ var builtins = map[string]*object.Builtin{
 			}
 		},
 	},
-	"first": &object.Builtin{
+	"first": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
 					len(args))
-}
+			}
 			if args[0].Type() != object.ARRAY_OBJ {
-return newError("argument to `first` must be ARRAY, got %s",
+				return newError("argument to `first` must be ARRAY, got %s",
 					args[0].Type())
 			}
 			arr := args[0].(*object.Array)
@@ -41,7 +42,7 @@ return newError("argument to `first` must be ARRAY, got %s",
 			return NULL
 		},
 	},
-	"last": &object.Builtin{
+	"last": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
@@ -59,7 +60,7 @@ return newError("argument to `first` must be ARRAY, got %s",
 			return NULL
 		},
 	},
-	"others": &object.Builtin{
+	"others": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1",
@@ -79,7 +80,7 @@ return newError("argument to `first` must be ARRAY, got %s",
 			return NULL
 		},
 	},
-	"push": &object.Builtin{
+	"push": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 2 {
 				return newError("wrong number of arguments. got=%d, want=2",
@@ -97,7 +98,7 @@ return newError("argument to `first` must be ARRAY, got %s",
 			return &object.Array{Elements: newElements}
 		},
 	},
-	"pop": &object.Builtin{
+	"pop": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1", len(args))
@@ -115,15 +116,16 @@ return newError("argument to `first` must be ARRAY, got %s",
 			return popped
 		},
 	},
-	"write_down": &object.Builtin{
+	"write_down": {
 		Fn: func(args ...object.Object) object.Object {
+			var result object.Object
 			for _, arg := range args {
 				fmt.Println(arg.Inspect())
 			}
-			return NULL
+			return result
 		},
 	},
-	"exit": &object.Builtin{
+	"exit": {
 		Fn: func(_ ...object.Object) object.Object {
 			os.Exit(2)
 			return NULL

@@ -2,6 +2,8 @@ package evaluator
 
 import (
 	"fmt"
+	"strconv"
+
 	"flango/ast"
 	"flango/object"
 )
@@ -36,6 +38,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return right
 		}
 		return evalPrefixExpression(node.Operator, right)
+
 	case *ast.InfixExpression:
 		left := Eval(node.Left, env)
 		if isError(left) {
@@ -65,6 +68,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return val
 		}
 		env.Set(node.Name.Value, val)
+
 	case *ast.FunctionLiteral:
 		params := node.Parameters
 		body := node.Body
@@ -99,6 +103,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalIndexExpression(left, index)
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
+	case *ast.ForStatement:
+		return evalForloop(node, env)
 
 	}
 	return nil
@@ -117,6 +123,7 @@ func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	}
 	return result
 }
+
 func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {
 	var result object.Object
 	for _, statement := range block.Statements {
@@ -144,6 +151,12 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 		return evalBangOperatorExpression(right)
 	case "-":
 		return evalMinusPrefixOperatorExpression(right)
+	case "--":
+		return evalDoubleMinusPrefixOperatorExpression(right)
+	case "+":
+		return evalPLusPrefixOperatorExpression(right)
+	case "++":
+		return evalDoublePlusPrefixOperatorExpression(right)
 	default:
 		return newError("unknown operator: %s%s", operator, right.Type())
 	}
@@ -161,12 +174,37 @@ func evalBangOperatorExpression(right object.Object) object.Object {
 		return FALSE
 	}
 }
+
 func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	if right.Type() != object.INTEGER_OBJ {
 		return newError("unknown operator: -%s", right.Type())
 	}
 	value := right.(*object.Integer).Value
 	return &object.Integer{Value: -value}
+}
+
+func evalDoubleMinusPrefixOperatorExpression(right object.Object) object.Object {
+	if right.Type() != object.INTEGER_OBJ {
+		return newError("unknown operator: -%s", right.Type())
+	}
+	value := right.(*object.Integer).Value
+	return &object.Integer{Value: value - 1}
+}
+
+func evalPLusPrefixOperatorExpression(right object.Object) object.Object {
+	if right.Type() != object.INTEGER_OBJ {
+		return newError("unknown operator: -%s", right.Type())
+	}
+	value := right.(*object.Integer).Value
+	return &object.Integer{Value: value}
+}
+
+func evalDoublePlusPrefixOperatorExpression(right object.Object) object.Object {
+	if right.Type() != object.INTEGER_OBJ {
+		return newError("unknown operator: -%s", right.Type())
+	}
+	value := right.(*object.Integer).Value
+	return &object.Integer{Value: value + 1}
 }
 
 func evalInfixExpression(
@@ -206,10 +244,22 @@ func evalIntegerInfixExpression(
 	case "*":
 		return &object.Integer{Value: leftVal * rightVal}
 	case "/":
-    if rightVal==0{
-      return NULL
-    }
+		if rightVal == 0 {
+			return newError("deviding by 0 is not permeted")
+		}
 		return &object.Integer{Value: leftVal / rightVal}
+	case "-=":
+		return &object.Integer{Value: leftVal - rightVal}
+	case "+=":
+		return &object.Integer{Value: leftVal + rightVal}
+	case "/=":
+		if rightVal == 0 {
+			return newError("deviding by 0 is not permeted")
+		}
+		return &object.Integer{Value: leftVal / rightVal}
+	case "*=":
+		return &object.Integer{Value: leftVal * rightVal}
+
 	case "<":
 		return nativeBoolToBooleanObject(leftVal < rightVal)
 	case ">":
@@ -237,6 +287,7 @@ func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Obje
 		return NULL
 	}
 }
+
 func isTruthy(obj object.Object) bool {
 	switch obj {
 	case NULL:
@@ -305,6 +356,7 @@ func extendFunctionEnv(
 	}
 	return env
 }
+
 func unwrapReturnValue(obj object.Object) object.Object {
 	if returnValue, ok := obj.(*object.ReturnValue); ok {
 		return returnValue.Value
@@ -335,6 +387,7 @@ func evalIndexExpression(left, index object.Object) object.Object {
 		return newError("index operator not supported: %s", left.Type())
 	}
 }
+
 func evalArrayIndexExpression(array, index object.Object) object.Object {
 	arrayObject := array.(*object.Array)
 	idx := index.(*object.Integer).Value
@@ -380,4 +433,48 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 		return NULL
 	}
 	return pair.Value
+}
+
+func evalForloop(fs *ast.ForStatement, env *object.Environment) object.Object {
+	var result object.Object
+	oldVal, _ := env.Get(fs.Name.Literal)
+	var existsValEval object.Object
+	existsValEval = Eval(fs.Value, env)
+	env.Set(fs.Name.Literal, existsValEval)
+	stepEval := Eval(fs.Step, env)
+	stepInc, err := strconv.Atoi(stepEval.Inspect())
+	if err != nil {
+		return nil
+	}
+	var maxVal int
+	maxVal = int(fs.Condition.String()[5]-48) - 1
+	temp, err := strconv.Atoi(existsValEval.Inspect())
+	if err != nil {
+		return nil
+	}
+	operator := string(fs.Condition.String()[3])
+	if operator == ">" && temp > maxVal && stepInc < temp {
+		stepy := temp - int(stepInc)
+		maxVal += 2
+		for temp > maxVal {
+			temp -= stepy
+			bodyParsing := Eval(fs.Body, env)
+			if bodyParsing != nil {
+				fmt.Println(bodyParsing.Inspect())
+			}
+
+		}
+	} else if operator == "<" && temp < maxVal && stepInc > temp {
+		stepy := int(stepInc)
+		for temp < maxVal {
+			temp += stepy
+			bodyParsing := Eval(fs.Body, env)
+			if bodyParsing != nil {
+				fmt.Println(bodyParsing.Inspect())
+			}
+
+		}
+	}
+	env.Set(fs.Name.Literal, oldVal)
+	return result
 }
