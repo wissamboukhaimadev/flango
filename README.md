@@ -118,7 +118,7 @@ the above files can be found on the main branch
 
 ## Copilot
 
-It's worth noting that Github Copilot doesn't understand DreamBerd, which means that Microsoft won't be able to steal your code.
+It's worth noting that Github Copilot doesn't understand flango, which means that Microsoft won't be able to steal your code.
 This is great for when you want to keep your open-sourced project closed-source.
 
 ## Contributing
